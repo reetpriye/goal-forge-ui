@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+:root {
+  --color-bg: rgb(12,12,12);
+  --color-accent: rgb(138,5,255);
+}
+
+body {
+  background: var(--color-bg);
+}
+
+/* Custom focus border using the accent color variable */
+.focus-accent-border:focus {
+  border-color: var(--color-accent) !important;
+  border-width: 1px !important;
+}
+
+/* Logo dynamic coloring with accent color */
+.logo-container {
+  transition: filter 0.3s ease;
+}
+
+.logo-container svg path {
+  fill: var(--color-accent);
+  transition: fill 0.3s ease;
+}
+
+/* Add a subtle glow effect when hovering over the logo */
+.logo-container:hover {
+  filter: drop-shadow(0 0 8px var(--color-accent));
+}

@@ -1,69 +1,55 @@
-# React + TypeScript + Vite
+![Still in development](https://dummyimage.com/600x120/222/fff&text=Still+in+development)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![App Preview](./src/assets/sample.png)
 
-Currently, two official plugins are available:
+# Goal Forge → Shape and build your goals step by step
+### Keep watching efforts on a calendar for easier tracking
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to Use the App
 
-## Expanding the ESLint configuration
+### 1. Check Server Status
+- **Green:** The server is ready.
+- **Red:** Wait until it turns green before proceeding.
+- ⚠️ You cannot sign in while the server is red.
+- ℹ️ This happens because the app is hosted on Render’s free tier, which puts the server to sleep when inactive. It may take a short time to wake up.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 2. Sign In (Optional)
+You can use the app without signing in, but your goals will only be saved locally.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+To save goals to the cloud and sync across devices:
+1. Click "Sign in with Google".
+2. If you already have local goals, you’ll get these options:
+   - **Append** – Add your local goals to your account.
+   - **Reset** – Replace local goals with your server goals.
+   - **Skip Import** – Ignore local goals and continue with your account goals.
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### 3. Add a New Goal
+1. Enter your goal’s name.
+2. Select the type:
+   - **Hr:** Track by hours (e.g., "Study 20 hours").
+   - **Cnt:** Track by count (e.g., "Read 10 books").
+3. Enter the estimated effort (e.g., 20 hours or 10 books).
+4. Click "Add Goal".
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The new goal will appear with the status **"Not Started"**.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 4. Manage Goals
+Open the menu (three dots) next to a goal to:
+- **Start** – Begin tracking progress.
+- **Pause** – Temporarily stop tracking.
+- **Resume** – Continue tracking after pausing.
+- **Complete** – Mark the goal as finished.
+- **Delete** – Remove the goal permanently.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 5. Log Progress
+- Click on a goal to log your daily progress.
+- Enter how much you’ve completed.
+- The progress bar will update automatically.
+- **You cannot log for previous days.** This has been kept because we want users to keep checking this app daily, so that it helps them to be on track.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 6. Personalize the App
+- Use the color switcher in the bottom-right corner to change the app’s accent color.
+
+---
+
+There are tons of goal tracking apps. But the motive of this app is to keep it minimalistic and have only required functions.

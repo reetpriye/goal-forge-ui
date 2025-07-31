@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import initialData from '../data/initialData.json';
+const API_URL = import.meta.env.VITE_API_URL;
 import Header from './Header';
 import GoalForm from './GoalForm';
 import GoalTable from './GoalTable';
 import ErrorAlert from './ErrorAlert';
 import CalendarModal from './CalendarModal';
-import GoogleSignInButton from './GoogleSignInButton';
 import ImportChoiceModal from './ImportChoiceModal';
 
-function Dashboard() {
+function Dashboard({ serverReady }: { serverReady?: boolean }) {
   const [showImportChoice, setShowImportChoice] = useState(false);
   const [pendingJwt, setPendingJwt] = useState<string | null>(null);
   const [pendingUser, setPendingUser] = useState<any>(null);
@@ -50,7 +49,7 @@ function Dashboard() {
           }
           return goal;
         });
-        await axios.post('http://localhost:8080/api/goals/import', { goals: parsedGoals, mode: 'append' }, {
+        await axios.post(`${API_URL}/api/goals/import`, { goals: parsedGoals, mode: 'append' }, {
           headers: { Authorization: `Bearer ${pendingJwt}` }
         });
       }
@@ -91,7 +90,7 @@ function Dashboard() {
           }
           return goal;
         });
-        await axios.post('http://localhost:8080/api/goals/import', { goals: parsedGoals, mode: 'reset' }, {
+        await axios.post(`${API_URL}/api/goals/import`, { goals: parsedGoals, mode: 'reset' }, {
           headers: { Authorization: `Bearer ${pendingJwt}` }
         });
       }
@@ -118,16 +117,6 @@ function Dashboard() {
     setPendingJwt(null);
     setPendingUser(null);
   };
-
-  const handleSignOut = () => {
-    setJwt(null);
-    setUser(null);
-    localStorage.removeItem('jwt');
-    localStorage.removeItem('user');
-    setGoals([]);
-    setError("");
-    fetchGoals(undefined);
-  };
   type EffortEntry = {
     date: string;
     effort: number;
@@ -147,8 +136,7 @@ function Dashboard() {
   const [newGoal, setNewGoal] = useState<Goal>({ id: '', goalName: '', progressType: '', estimatedEffort: 0, progressCalendar: [] });
   const [error, setError] = useState('');
   const [calendarGoal, setCalendarGoal] = useState<Goal | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [effortValue, setEffortValue] = useState<number>(0);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -183,7 +171,7 @@ function Dashboard() {
       return;
     }
     try {
-      const res = await axios.get<Goal[]>("http://localhost:8080/api/goals", {
+      const res = await axios.get<Goal[]>(`${API_URL}/api/goals`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGoals(res.data);
@@ -213,7 +201,7 @@ function Dashboard() {
       return;
     }
     try {
-      await axios.post("http://localhost:8080/api/goals", {
+      await axios.post(`${API_URL}/api/goals`, {
         goalName: newGoal.goalName,
         progressType: newGoal.progressType,
         estimatedEffort: newGoal.estimatedEffort
@@ -228,138 +216,102 @@ function Dashboard() {
     }
   };
 
-  const deleteGoal = async (id: string) => {
-    if (!jwt) {
-      // Anonymous user: delete from localStorage
-      const localGoals = localStorage.getItem('goals');
-      const goalsArr = localGoals ? JSON.parse(localGoals) : [];
-      const updatedGoals = goalsArr.filter((g: any) => g.id !== id);
-      localStorage.setItem('goals', JSON.stringify(updatedGoals));
-      setGoals(updatedGoals);
-      setError("");
-      return;
-    }
-    try {
-      await axios.delete(`http://localhost:8080/api/goals/${id}`, {
-        headers: { Authorization: `Bearer ${jwt}` }
-      });
-      fetchGoals(jwt);
-    } catch (err) {
-      setError("Error deleting goal");
-    }
-  };
-
   // Calendar modal logic
   const openCalendar = (goal: Goal) => {
     setCalendarGoal(goal);
     setShowCalendar(true);
     setSelectedDate(new Date());
-    setEffortValue(0);
   };
 
-  const closeCalendar = () => {
-    setShowCalendar(false);
-    setCalendarGoal(null);
-    setSelectedDate(new Date());
-    setEffortValue(0);
-  };
 
-  const handleEffortSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!calendarGoal || effortValue <= 0 || !selectedDate) return;
-    const dateStr = selectedDate.toISOString().split('T')[0];
-    let success = false;
-    try {
-      await axios.post(`http://localhost:8080/api/goals/${calendarGoal.id}/progress`, {
-        date: dateStr,
-        effort: effortValue,
-      }, {
-        headers: jwt ? { Authorization: `Bearer ${jwt}` } : undefined
-      });
-      fetchGoals(jwt || undefined);
-      setError("");
-      success = true;
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Error adding effort");
-    }
-    if (success) closeCalendar();
-  };
-
-  // Seed initial data
-  const seedInitialData = async () => {
-    if (!jwt) {
-      // Anonymous user: seed to localStorage, add unique id to each goal
-      const rawGoals = initialData.goals || initialData;
-      const goalsWithId = rawGoals.map((goal: any, idx: number) => ({
-        ...goal,
-        id: Date.now().toString() + '-' + idx
-      }));
-      localStorage.setItem('goals', JSON.stringify(goalsWithId));
-      setGoals(goalsWithId);
-      setError("");
-      return;
-    }
-    try {
-      await axios.post('http://localhost:8080/api/goals/import', initialData, {
-        headers: { Authorization: `Bearer ${jwt}` }
-      });
-      fetchGoals(jwt);
-      setError("");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Error seeding initial data");
+  // Handle skip import choice
+  const handleSkipImportChoice = () => {
+    if (pendingJwt && pendingUser) {
+      setJwt(pendingJwt);
+      setUser(pendingUser);
+      localStorage.setItem('jwt', pendingJwt);
+      localStorage.setItem('user', JSON.stringify(pendingUser));
+      setShowImportChoice(false);
+      setPendingJwt(null);
+      setPendingUser(null);
+      fetchGoals(pendingJwt);
+    } else {
+      setShowImportChoice(false);
+      setPendingJwt(null);
+      setPendingUser(null);
     }
   };
-
   return (
-    <div className="container mx-auto p-6 text-sm">
-      <ImportChoiceModal
-        show={showImportChoice}
-        onAppend={handleAppendLocalGoals}
-        onReset={handleResetWithLocalGoals}
-        onCancel={handleCancelImportChoice}
-      />
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <Header seedInitialData={seedInitialData} />
-          {user ? (
-            <div className="flex items-center gap-3">
-              <span className="font-semibold">{user.name}</span>
-              <button onClick={handleSignOut} className="bg-gray-700 text-white px-3 py-1 rounded">Sign Out</button>
-            </div>
-          ) : (
-            <GoogleSignInButton onLogin={handleGoogleLogin} />
-          )}
+    <>
+      <div className="container mx-auto p-4 text-sm min-h-screen bg-gray-50 dark:bg-gray-900">
+        <ImportChoiceModal
+          show={showImportChoice}
+          onAppend={handleAppendLocalGoals}
+          onReset={handleResetWithLocalGoals}
+          onCancel={handleCancelImportChoice}
+          onSkip={handleSkipImportChoice}
+        />
+        <div className="mb-0" style={{background: 'rgb(13,13,13)', boxShadow: 'none', borderRadius: 0}}>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
+            <Header user={user} onLogin={handleGoogleLogin} onLogout={() => {
+              setJwt(null);
+              setUser(null);
+              localStorage.removeItem('jwt');
+              localStorage.removeItem('user');
+            }} />
+            {/* Sign-in and user info now handled by Header. Remove duplicate UI here. */}
+          </div>
+          <GoalForm newGoal={newGoal} setNewGoal={setNewGoal} addGoal={addGoal} />
+          <ErrorAlert error={error} />
+          <div className="overflow-x-auto">
+            {loading ? (
+              <div className="flex justify-center items-center w-full h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-solid"></div>
+                <span className="ml-4 text-blue-600 font-semibold text-lg">Loading...</span>
+              </div>
+            ) : (
+              <GoalTable goals={goals} fetchGoals={fetchGoals} jwt={jwt} openCalendar={openCalendar} />
+            )}
+          </div>
         </div>
-        <GoalForm newGoal={newGoal} setNewGoal={setNewGoal} addGoal={addGoal} />
-        <ErrorAlert error={error} />
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="flex justify-center items-center w-full h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-solid"></div>
-              <span className="ml-4 text-blue-600 font-semibold text-lg">Loading...</span>
-            </div>
-          ) : (
-            <GoalTable goals={goals} fetchGoals={fetchGoals} jwt={jwt} openCalendar={openCalendar} />
-          )}
-        </div>
+        <CalendarModal
+          showCalendar={showCalendar}
+          setShowCalendar={setShowCalendar}
+          calendarGoal={calendarGoal}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          jwt={jwt}
+          fetchGoals={fetchGoals}
+        />
       </div>
-      <CalendarModal
-        showCalendar={showCalendar}
-        calendarGoal={calendarGoal}
-        effortValue={effortValue}
-        setEffortValue={setEffortValue}
-        selectedDate={selectedDate}
-        setSelectedDate={(dateOrArray) => {
-          if (Array.isArray(dateOrArray)) {
-            setSelectedDate(dateOrArray[0] || new Date());
-          } else if (dateOrArray instanceof Date) {
-            setSelectedDate(dateOrArray);
-          }
-        }}
-        handleEffortSubmit={handleEffortSubmit}
-        closeCalendar={closeCalendar}
-      />
-    </div>
+      {/* Server status indicator in bottom left */}
+      <div style={{
+        position: 'fixed',
+        left: 16,
+        bottom: 16,
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(20,20,20,0.95)',
+        borderRadius: 8,
+        padding: '6px 14px 6px 10px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+        fontSize: 13,
+        color: '#e5e7eb',
+        minWidth: 60
+      }}>
+        <span className="text-xs text-gray-400 mr-2">server</span>
+        <span style={{
+          display: 'inline-block',
+          width: 10,
+          height: 10,
+          borderRadius: '50%',
+          background: serverReady ? '#22c55e' : '#ef4444',
+          boxShadow: serverReady ? '0 0 4px #22c55e' : '0 0 4px #ef4444',
+          transition: 'background 0.3s, box-shadow 0.3s'
+        }} />
+      </div>
+    </>
   );
 }
 

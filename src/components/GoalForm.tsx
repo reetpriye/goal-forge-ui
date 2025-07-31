@@ -16,43 +16,53 @@ const GoalForm: React.FC<GoalFormProps> = ({ newGoal, setNewGoal, addGoal }) => 
   return (
     <form
       onSubmit={addGoal}
-      className="flex gap-4 mb-6 items-end"
+      className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-6 items-stretch sm:items-end w-full"
     >
-      <input
-        type="text"
-        placeholder="Goal Name"
-        value={newGoal.goalName}
-        onChange={e => setNewGoal({ ...newGoal, goalName: e.target.value })}
-        required
-        className="border rounded-lg px-3 py-2 flex-1 focus:ring-2 focus:ring-blue-400"
-      />
-      <div className="flex gap-2">
+      <div className="flex flex-row gap-2 w-full">
+        <input
+          type="text"
+          placeholder="Goal Name"
+          value={newGoal.goalName}
+          onChange={e => setNewGoal({ ...newGoal, goalName: e.target.value })}
+          required
+          className="border border-transparent rounded-lg px-3 py-2 flex-1 focus:outline-none focus-accent-border min-w-0"
+        />
+        <div className="flex gap-1 min-w-[90px]">
+          <button
+            type="button"
+            className={`px-3 py-2 rounded-lg border transition-colors duration-150 text-xs sm:text-base ${newGoal.progressType === 'hr' ? 'border-[rgb(138,5,255)] bg-blue-600 text-white' : 'border-gray-500 bg-transparent text-blue-600'} font-semibold shadow focus:outline-none focus:border-[rgb(138,5,255)]`}
+            style={{ borderColor: newGoal.progressType === 'hr' ? 'var(--color-accent)' : '' }}
+            onClick={() => setNewGoal({ ...newGoal, progressType: 'hr' })}
+          >
+            Hr
+          </button>
+          <button
+            type="button"
+            className={`px-3 py-2 rounded-lg border transition-colors duration-150 text-xs sm:text-base ${newGoal.progressType === 'cnt' ? 'bg-blue-600 text-white' : 'border-gray-500 bg-transparent text-blue-600'} font-semibold shadow focus:outline-none focus:border-[rgb(138,5,255)]`}
+            style={{ borderColor: newGoal.progressType === 'cnt' ? 'var(--color-accent)' : '' }}
+            onClick={() => setNewGoal({ ...newGoal, progressType: 'cnt' })}
+          >
+            Cnt
+          </button>
+        </div>
+      </div>
+      <div className="flex flex-row gap-2 w-full">
+        <input
+          type="number"
+          placeholder="Estimated Effort"
+          value={newGoal.estimatedEffort}
+          onChange={e => setNewGoal({ ...newGoal, estimatedEffort: Number(e.target.value) })}
+          required
+          className="border border-transparent rounded-lg px-3 py-2 w-1/2 focus:outline-none focus-accent-border min-w-0"
+        />
         <button
-          type="button"
-          className={`px-4 py-2 rounded-lg border transition-colors duration-150 ${newGoal.progressType === 'hr' ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-white text-blue-600'} font-semibold shadow focus:outline-none`}
-          style={{ boxShadow: newGoal.progressType === 'hr' ? '0 0 0 2px #2563eb' : undefined }}
-          onClick={() => setNewGoal({ ...newGoal, progressType: 'hr' })}
+          type="submit"
+          className="w-1/2 hover:bg-blue-700 text-white px-3 py-2 rounded-lg shadow transition border"
+          style={{ borderWidth: '0.5px', borderColor: 'var(--color-accent)' }}
         >
-          Hr
-        </button>
-        <button
-          type="button"
-          className={`px-4 py-2 rounded-lg border transition-colors duration-150 ${newGoal.progressType === 'cnt' ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-white text-blue-600'} font-semibold shadow focus:outline-none`}
-          style={{ boxShadow: newGoal.progressType === 'cnt' ? '0 0 0 2px #2563eb' : undefined }}
-          onClick={() => setNewGoal({ ...newGoal, progressType: 'cnt' })}
-        >
-          Cnt
+          Add Goal
         </button>
       </div>
-      <input
-        type="number"
-        placeholder="Estimated Effort"
-        value={newGoal.estimatedEffort}
-        onChange={e => setNewGoal({ ...newGoal, estimatedEffort: Number(e.target.value) })}
-        required
-        className="border rounded-lg px-3 py-2 w-40 focus:ring-2 focus:ring-blue-400"
-      />
-      <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition">Add Goal</button>
     </form>
   );
 };

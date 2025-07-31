@@ -1,49 +1,46 @@
 body, .container {
-  font-family: 'Inter', Arial, sans-serif;
-  background: #18181b;
+  font-family: "Roobert", "Roobert Fallback", Arial, sans-serif;
+  background: rgb(12, 12, 12);
   color: #e5e7eb;
-}
-
-.container {
-  min-height: 100vh;
-}
-
-.bg-white {
-  background: #23232a;
 }
 
 input, select, button {
   outline: none;
-  background: #23232a;
+  background: rgb(12, 12, 12);
   color: #e5e7eb;
-  border: 1px solid #3f3f46;
+  border: 1px solid rgb(39, 39, 39);
+  border-radius: 0;
+  border-width: 1px;
 }
-input:focus, select:focus {
-  border-color: #6366f1;
-  background: #18181b;
+
+input:focus, select:focus, button:focus, input:active, select:active, button:active {
+  border-color: #a78bfa;
+  background: rgb(12, 12, 12);
 }
 
 button {
-  background: #23232a;
+  background: rgb(12,12,12);
   color: #e5e7eb;
   border: 1px solid #3f3f46;
   transition: background 0.2s, color 0.2s;
 }
+
 button:hover {
   background: #31313a;
   color: #a5b4fc;
 }
+
 button:active {
   transform: scale(0.98);
 }
 
 .bg-gradient-to-r {
-  background: #23232a !important;
+  background: rgb(12,12,12) !important;
 }
 
 ::-webkit-scrollbar {
   height: 8px;
-  background: #23232a;
+  background: rgb(12,12,12);
 }
 ::-webkit-scrollbar-thumb {
   background: #3f3f46;
@@ -52,16 +49,22 @@ button:active {
 
 
 /* Table and card styling for dark mode */
+table, th, td {
+  background: rgb(12, 12, 12) !important;
+  border-radius: 0 !important;
+  border-width: 1px !important;
+}
 .table, .bg-white, .rounded-xl, .shadow-lg, .shadow-md {
-  background: #23232a !important;
+  background: rgb(12, 12, 12) !important;
+  border-radius: 0 !important;
 }
 th, td {
-  border-color: #3f3f46 !important;
+  border-color: rgb(39, 39, 39) !important;
 }
 tr.bg-blue-50 {
-  background: #23232a !important;
+  background: rgb(12,12,12) !important;
 }
 tr:hover, .hover\:bg-blue-50:hover {
-  background: #23232a !important;
+  background: rgb(12,12,12) !important;
   color: #a5b4fc;
 }
