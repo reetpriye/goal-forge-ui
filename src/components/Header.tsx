@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ seedInitialData }) => (
-  <div className="flex items-center justify-between mb-6 border-b pb-4">
+  <div className="flex items-center justify-between mb-6 border-b pb-4 gap-4">
     <div className="flex items-center gap-3">
       <Logo />
       <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: '#60a5fa' }}>Goal Forge</h1>
