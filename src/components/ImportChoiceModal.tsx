@@ -1,0 +1,33 @@
+import React from 'react';
+
+interface ImportChoiceModalProps {
+  show: boolean;
+  onAppend: () => void;
+  onReset: () => void;
+  onCancel: () => void;
+}
+
+const ImportChoiceModal: React.FC<ImportChoiceModalProps> = ({ show, onAppend, onReset, onCancel }) => {
+  if (!show) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-8 shadow-lg min-w-[350px]">
+        <h2 className="text-lg font-bold mb-4">Import Local Goals</h2>
+        <p className="mb-6 text-gray-700">You have unsaved goals in your browser. What would you like to do?</p>
+        <div className="flex flex-col gap-3">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onClick={onAppend}>
+            Append local goals to your account
+          </button>
+          <button className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600" onClick={onReset}>
+            Reset your account with local goals (overwrite)
+          </button>
+          <button className="mt-2 text-gray-600 hover:underline" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ImportChoiceModal;
