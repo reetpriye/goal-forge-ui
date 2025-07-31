@@ -1,0 +1,74 @@
+body, .container {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #18181b;
+  color: #e5e7eb;
+}
+
+.container {
+  min-height: 100vh;
+}
+
+.bg-white {
+  background: #23232a;
+}
+
+input, select, button {
+  outline: none;
+  background: #23232a;
+  color: #e5e7eb;
+  border: 1px solid #3f3f46;
+}
+input:focus, select:focus {
+  border-color: #6366f1;
+  background: #18181b;
+}
+
+button {
+  background: #23232a;
+  color: #e5e7eb;
+  border: 1px solid #3f3f46;
+  transition: background 0.2s, color 0.2s;
+}
+button:hover {
+  background: #31313a;
+  color: #a5b4fc;
+}
+button:active {
+  transform: scale(0.98);
+}
+
+.bg-gradient-to-r {
+  background: #23232a !important;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  background: #23232a;
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s cubic-bezier(.4,0,.6,1) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+/* Table and card styling for dark mode */
+.table, .bg-white, .rounded-xl, .shadow-lg, .shadow-md {
+  background: #23232a !important;
+}
+th, td {
+  border-color: #3f3f46 !important;
+}
+tr.bg-blue-50 {
+  background: #23232a !important;
+}
+tr:hover, .hover\:bg-blue-50:hover {
+  background: #23232a !important;
+  color: #a5b4fc;
+}
