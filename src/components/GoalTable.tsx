@@ -17,6 +17,16 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
   const [menuPosition, setMenuPosition] = useState<{top: number, left: number} | null>(null);
   const menuBtnRefs = useRef<{[key: string]: HTMLButtonElement | null}>({});
 
+  // Helper function to format duration for display
+  const formatDuration = (minutes: number) => {
+    if (minutes === 0) return '0';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours === 0) return `${mins}m`;
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h${mins}m`;
+  };
+
 
   React.useEffect(() => {
     const closeMenu = (e: MouseEvent) => {
@@ -148,19 +158,24 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                   const remainingEffort = Math.max(totalEffort - investedEffort, 0);
                   const investedPercent = totalEffort ? (investedEffort / totalEffort) * 100 : 0;
                   const remainingPercent = totalEffort ? (remainingEffort / totalEffort) * 100 : 0;
+                  
+                  // Format display values based on goal type
+                  const formatValue = (value: number) => 
+                    goal.progressType === 'dur' ? formatDuration(value) : value.toString();
+                  
                   return (
                     <div className="w-full h-0.5 bg-gray-200 rounded flex overflow-hidden min-w-[120px] relative">
                       <div
                         className="h-full"
                         style={{ width: `${investedPercent}%`, backgroundColor: 'var(--color-accent)' }}
-                        title={`Invested: ${investedEffort}`}
+                        title={`Invested: ${formatValue(investedEffort)}`}
                       ></div>
                       <div
                         className="h-full bg-gray-400"
                         style={{ width: `${remainingPercent}%` }}
-                        title={`Remaining: ${remainingEffort}`}
+                        title={`Remaining: ${formatValue(remainingEffort)}`}
                       ></div>
-                      <span className="absolute left-1 top-1 text-xs font-bold" style={{ color: 'var(--color-accent)' }}>{investedEffort}/{totalEffort}</span>
+                      <span className="absolute left-1 top-1 text-xs font-bold" style={{ color: 'var(--color-accent)' }}>{formatValue(investedEffort)}/{formatValue(totalEffort)}</span>
                     </div>
                   );
                 })()}

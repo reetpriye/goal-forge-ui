@@ -59,6 +59,27 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
   const [editingDate, setEditingDate] = React.useState<string | null>(null);
   const [inputEffort, setInputEffort] = React.useState<number>(0);
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  
+  // For duration goals, separate hours and minutes input
+  const [inputHours, setInputHours] = React.useState<number>(0);
+  const [inputMinutes, setInputMinutes] = React.useState<number>(0);
+  
+  // Update inputEffort when hours or minutes change for duration goals
+  React.useEffect(() => {
+    if (calendarGoal?.progressType === 'dur') {
+      setInputEffort(inputHours * 60 + inputMinutes);
+    }
+  }, [inputHours, inputMinutes, calendarGoal?.progressType]);
+
+  // Helper function to format duration for display
+  const formatDuration = (minutes: number) => {
+    if (minutes === 0) return '0';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours === 0) return `${mins}m`;
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h${mins}m`;
+  };
   // Normalize progressCalendar to array of { date, effort }
   const normalizeProgress = (progress: any) => {
     if (Array.isArray(progress)) return progress;
@@ -217,7 +238,17 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     setEditingDate(dateStr);
     // Pre-fill input with current effort value if exists, otherwise default to 0
     const entry = localProgress.find((e: any) => e.date === dateStr);
-    setInputEffort(entry ? entry.effort : 0);
+    const currentEffort = entry ? entry.effort : 0;
+    setInputEffort(currentEffort);
+    
+    // For duration goals, also set hours and minutes
+    if (calendarGoal?.progressType === 'dur') {
+      const hours = Math.floor(currentEffort / 60);
+      const minutes = currentEffort % 60;
+      setInputHours(hours);
+      setInputMinutes(minutes);
+    }
+    
     setSelectedDate(dateObj);
   };
 
@@ -230,37 +261,19 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     const isFutureOrToday = date >= today;
     const entry = localProgress.find((e: any) => e.date === dateStr);
     if (editingDate === dateStr && isFutureOrToday) {
+      // Show a simple indicator that this date is being edited
       return (
         <div className="flex items-center justify-center min-h-[48px]">
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            autoFocus
-            value={inputEffort}
-            onChange={e => {
-              const val = e.target.value.replace(/[^0-9]/g, '');
-              setInputEffort(val ? Number(val) : 0);
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && inputEffort >= 0) {
-                handleEffortSave(dateStr);
-              }
-              if (e.key === 'Escape') {
-                setEditingDate(null);
-              }
-            }}
-            className="w-10 text-center text-green-500 bg-gray-900 border rounded-none appearance-none focus:outline-none"
-            style={{ fontSize: '0.9em', borderWidth: '1px', borderColor: 'var(--color-accent)' }}
-          />
+          <span className="bg-blue-500 text-white px-2 py-1 font-bold text-[0.9em] min-w-[24px] inline-block border border-blue-400 rounded-none animate-pulse">Edit</span>
         </div>
       );
     }
     // Always show a value, 0 if no entry
     const effortValue = entry ? entry.effort : 0;
+    const displayValue = calendarGoal?.progressType === 'dur' ? formatDuration(effortValue) : effortValue.toString();
     return (
       <div className="flex items-center justify-center min-h-[48px]">
-        <span className="bg-gray-100 text-gray-900 px-2 py-1 font-bold text-[0.9em] min-w-[24px] inline-block border border-gray-400 rounded-none">{effortValue}</span>
+        <span className="bg-gray-100 text-gray-900 px-2 py-1 font-bold text-[0.9em] min-w-[24px] inline-block border border-gray-400 rounded-none">{displayValue}</span>
       </div>
     );
   };
@@ -329,9 +342,9 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
           {/* Progress Bar */}
           <div className="mt-6">
             <div className="mb-2 flex flex-col sm:flex-row justify-center gap-2 sm:gap-8 items-center text-xs sm:text-sm">
-              <span className="font-bold text-green-600">Invested: {investedEffort}</span>
-              <span className="font-bold text-gray-500">Remaining: {remainingEffort}</span>
-              <span className="font-bold text-blue-600">Total: {totalEffort}</span>
+              <span className="font-bold text-green-600">Invested: {calendarGoal?.progressType === 'dur' ? formatDuration(investedEffort) : investedEffort}</span>
+              <span className="font-bold text-gray-500">Remaining: {calendarGoal?.progressType === 'dur' ? formatDuration(remainingEffort) : remainingEffort}</span>
+              <span className="font-bold text-blue-600">Total: {calendarGoal?.progressType === 'dur' ? formatDuration(totalEffort) : totalEffort}</span>
             </div>
             <div className="w-full h-2 sm:h-2 bg-gray-200 flex overflow-hidden" style={{ borderRadius: 0 }}>
               <div
@@ -344,6 +357,122 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
               ></div>
             </div>
           </div>
+
+          {/* Input Area */}
+          {editingDate && (
+            <div className="mt-6 p-4 bg-gray-800 rounded-lg border" style={{ borderColor: 'var(--color-accent)' }}>
+              <div className="text-center mb-3">
+                <span className="text-sm font-semibold">
+                  Logging effort for {new Date(editingDate + 'T00:00:00').toLocaleDateString()}
+                </span>
+              </div>
+              
+              {calendarGoal?.progressType === 'dur' ? (
+                // Duration input (hours and minutes)
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex gap-4 items-center">
+                    <div className="flex flex-col items-center">
+                      <label className="text-xs text-gray-400 mb-1">Hours</label>
+                      <input
+                        type="number"
+                        autoFocus
+                        value={inputHours}
+                        onChange={e => setInputHours(Math.max(0, Number(e.target.value)))}
+                        min="0"
+                        className="w-16 text-center text-white bg-gray-700 border rounded px-2 py-1 focus:outline-none focus:border-blue-500"
+                        style={{ borderColor: 'var(--color-accent)' }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && (inputHours > 0 || inputMinutes > 0)) {
+                            handleEffortSave(editingDate);
+                          }
+                          if (e.key === 'Escape') {
+                            setEditingDate(null);
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="text-xs text-gray-400 mb-1">Minutes</label>
+                      <input
+                        type="number"
+                        value={inputMinutes}
+                        onChange={e => setInputMinutes(Math.max(0, Math.min(59, Number(e.target.value))))}
+                        min="0"
+                        max="59"
+                        className="w-16 text-center text-white bg-gray-700 border rounded px-2 py-1 focus:outline-none focus:border-blue-500"
+                        style={{ borderColor: 'var(--color-accent)' }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && (inputHours > 0 || inputMinutes > 0)) {
+                            handleEffortSave(editingDate);
+                          }
+                          if (e.key === 'Escape') {
+                            setEditingDate(null);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-400 text-center">
+                    Total: {formatDuration(inputEffort)}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEffortSave(editingDate)}
+                      disabled={inputHours === 0 && inputMinutes === 0}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingDate(null)}
+                      className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // Count input
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center">
+                    <label className="text-xs text-gray-400 mb-1">Count</label>
+                    <input
+                      type="number"
+                      autoFocus
+                      value={inputEffort}
+                      onChange={e => setInputEffort(Math.max(0, Number(e.target.value)))}
+                      min="0"
+                      className="w-20 text-center text-white bg-gray-700 border rounded px-2 py-1 focus:outline-none focus:border-blue-500"
+                      style={{ borderColor: 'var(--color-accent)' }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && inputEffort > 0) {
+                          handleEffortSave(editingDate);
+                        }
+                        if (e.key === 'Escape') {
+                          setEditingDate(null);
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEffortSave(editingDate)}
+                      disabled={inputEffort === 0}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingDate(null)}
+                      className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {saveError && (
             <div className="text-red-500 text-center mt-2">{saveError}</div>
           )}
