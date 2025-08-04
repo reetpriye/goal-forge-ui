@@ -7,6 +7,8 @@ import GoalTable from './GoalTable';
 import ErrorAlert from './ErrorAlert';
 import CalendarModal from './CalendarModal';
 import ImportChoiceModal from './ImportChoiceModal';
+import EditGoalModal from './EditGoalModal';
+import EffortModal from './EffortModal';
 
 function Dashboard({ serverReady }: { serverReady?: boolean }) {
   const [showImportChoice, setShowImportChoice] = useState(false);
@@ -138,6 +140,10 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
   const [calendarGoal, setCalendarGoal] = useState<Goal | null>(null);
   const [selectedDate, setSelectedDate] = useState<any>(null);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [editGoal, setEditGoal] = useState<Goal | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showEffortModal, setShowEffortModal] = useState(false);
+  const [effortDate, setEffortDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -252,6 +258,45 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
     }
   };
 
+  const handleEditGoal = (goal: any) => {
+    setEditGoal(goal);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditGoal(null);
+  };
+
+  const handleGoalUpdated = () => {
+    if (jwt) {
+      fetchGoals(jwt);
+    }
+  };
+
+  const handleOpenEffortModal = (goal: Goal, dateStr: string) => {
+    setCalendarGoal(goal);
+    setEffortDate(dateStr);
+    setShowEffortModal(true);
+  };
+
+  const handleCloseEffortModal = () => {
+    setShowEffortModal(false);
+    setEffortDate('');
+    setCalendarGoal(null);
+  };
+
+  const handleEffortSaved = () => {
+    if (jwt) {
+      fetchGoals(jwt);
+    } else {
+      // For anonymous users, reload from localStorage
+      const localGoals = localStorage.getItem('goals');
+      if (localGoals) {
+        setGoals(JSON.parse(localGoals));
+      }
+    }
+  };
 
   // Handle skip import choice
   const handleSkipImportChoice = () => {
@@ -305,6 +350,7 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
                 jwt={jwt} 
                 openCalendar={openCalendar} 
                 onReorderGoals={handleReorderGoals}
+                onEditGoal={handleEditGoal}
               />
             )}
           </div>
@@ -317,6 +363,22 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
           setSelectedDate={setSelectedDate}
           jwt={jwt}
           fetchGoals={fetchGoals}
+          onOpenEffortModal={handleOpenEffortModal}
+        />
+        <EditGoalModal
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          goal={editGoal}
+          jwt={jwt}
+          onGoalUpdated={handleGoalUpdated}
+        />
+        <EffortModal
+          isOpen={showEffortModal}
+          onClose={handleCloseEffortModal}
+          goal={calendarGoal}
+          selectedDate={effortDate}
+          jwt={jwt}
+          onEffortSaved={handleEffortSaved}
         />
       </div>
       {/* Server status indicator in bottom left */}

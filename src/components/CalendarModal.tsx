@@ -53,9 +53,10 @@ interface CalendarModalProps {
   jwt?: string | null;
   fetchGoals?: (token?: string) => void;
   onEffortSaved?: () => void;
+  onOpenEffortModal?: (goal: any, dateStr: string) => void;
 }
 
-const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCalendar, calendarGoal, selectedDate, setSelectedDate, jwt, fetchGoals, onEffortSaved }) => {
+const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCalendar, calendarGoal, selectedDate, setSelectedDate, jwt, fetchGoals, onEffortSaved, onOpenEffortModal }) => {
   const [editingDate, setEditingDate] = React.useState<string | null>(null);
   const [inputEffort, setInputEffort] = React.useState<number>(0);
   const [saveError, setSaveError] = React.useState<string | null>(null);
@@ -155,7 +156,8 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
           let errorMsg = 'Failed to save effort.';
           try {
             const errorJson = await response.json();
-            if (errorJson && errorJson.message) errorMsg = errorJson.message;
+            // Extract just the message from error response
+            errorMsg = errorJson?.message || errorJson?.error || 'Failed to save effort';
           } catch {
             errorMsg = await response.text();
           }
@@ -218,7 +220,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     }
   };
 
-  // When a date is clicked, open input for that date
+  // When a date is clicked, open effort modal instead of inline editing
   const handleDateClick = (value: any) => {
     let dateObj: Date | null = null;
     if (Array.isArray(value)) {
@@ -235,18 +237,10 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     // Format date as local YYYY-MM-DD
     const pad = (n: number) => n.toString().padStart(2, '0');
     const dateStr = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}`;
-    setEditingDate(dateStr);
-    // Pre-fill input with current effort value if exists, otherwise default to 0
-    const entry = localProgress.find((e: any) => e.date === dateStr);
-    const currentEffort = entry ? entry.effort : 0;
-    setInputEffort(currentEffort);
     
-    // For duration goals, also set hours and minutes
-    if (calendarGoal?.progressType === 'dur') {
-      const hours = Math.floor(currentEffort / 60);
-      const minutes = currentEffort % 60;
-      setInputHours(hours);
-      setInputMinutes(minutes);
+    // Open effort modal instead of inline editing
+    if (onOpenEffortModal && calendarGoal) {
+      onOpenEffortModal(calendarGoal, dateStr);
     }
     
     setSelectedDate(dateObj);

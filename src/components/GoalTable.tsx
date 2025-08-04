@@ -11,9 +11,10 @@ interface GoalTableProps {
   jwt: string | null;
   openCalendar: (goal: any) => void;
   onReorderGoals?: (reorderedGoals: any[]) => void;
+  onEditGoal?: (goal: any) => void;
 }
 
-const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalendar, onReorderGoals }) => {
+const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalendar, onReorderGoals, onEditGoal }) => {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{top: number, left: number} | null>(null);
   const menuBtnRefs = useRef<{[key: string]: HTMLButtonElement | null}>({});
@@ -162,6 +163,12 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
       alert('Failed to delete goal');
     }
     setActionLoadingId(null);
+  };
+
+  const handleEditGoal = (goal: any) => {
+    if (onEditGoal) {
+      onEditGoal(goal);
+    }
   };
 
   return (
@@ -346,6 +353,13 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                             Complete
                           </button>
                         )}
+                        <button
+                          className="text-left px-4 py-2 hover:bg-blue-50"
+                          onClick={e => { e.stopPropagation(); handleEditGoal(goal); setMenuOpenId(null); }}
+                          disabled={actionLoadingId === goal.id}
+                        >
+                          Edit
+                        </button>
                         {(goal.status === 'NOT_STARTED' || goal.status === 'ACTIVE' || goal.status === 'PAUSED' || goal.status === 'COMPLETED') && (
                           <button
                             className="text-left px-4 py-2 hover:bg-red-50 text-red-600"
