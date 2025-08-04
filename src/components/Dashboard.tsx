@@ -223,6 +223,35 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
     setSelectedDate(new Date());
   };
 
+  // Handle goal reordering from drag and drop
+  const handleReorderGoals = async (reorderedGoals: Goal[]) => {
+    setGoals(reorderedGoals);
+    
+    // Save to localStorage if not using server
+    if (!jwt) {
+      localStorage.setItem('goals', JSON.stringify(reorderedGoals));
+      return;
+    }
+    
+    // Save order to server
+    try {
+      const goalIds = reorderedGoals.map(goal => goal.id);
+      await axios.put(`${API_URL}/api/goals/reorder`, {
+        goalIds: goalIds
+      }, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      
+      // Refresh goals to get updated order from server
+      await fetchGoals(jwt);
+    } catch (err) {
+      console.error('Failed to update goal order on server:', err);
+      setError('Failed to save goal order. Please try again.');
+      // Revert the local state change
+      fetchGoals(jwt);
+    }
+  };
+
 
   // Handle skip import choice
   const handleSkipImportChoice = () => {
@@ -270,7 +299,13 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
                 <span className="ml-4 text-blue-600 font-semibold text-lg">Loading...</span>
               </div>
             ) : (
-              <GoalTable goals={goals} fetchGoals={fetchGoals} jwt={jwt} openCalendar={openCalendar} />
+              <GoalTable 
+                goals={goals} 
+                fetchGoals={fetchGoals} 
+                jwt={jwt} 
+                openCalendar={openCalendar} 
+                onReorderGoals={handleReorderGoals}
+              />
             )}
           </div>
         </div>

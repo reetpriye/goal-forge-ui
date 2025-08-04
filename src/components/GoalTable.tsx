@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { FaEllipsisV } from 'react-icons/fa';
+import { FaEllipsisV, FaGripVertical } from 'react-icons/fa';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,12 +10,15 @@ interface GoalTableProps {
   fetchGoals: (token?: string) => void;
   jwt: string | null;
   openCalendar: (goal: any) => void;
+  onReorderGoals?: (reorderedGoals: any[]) => void;
 }
 
-const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalendar }) => {
+const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalendar, onReorderGoals }) => {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{top: number, left: number} | null>(null);
   const menuBtnRefs = useRef<{[key: string]: HTMLButtonElement | null}>({});
+  const [draggedGoal, setDraggedGoal] = useState<any>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Helper function to format duration for display
   const formatDuration = (minutes: number) => {
@@ -25,6 +28,55 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
     if (hours === 0) return `${mins}m`;
     if (mins === 0) return `${hours}h`;
     return `${hours}h${mins}m`;
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, goal: any) => {
+    setDraggedGoal(goal);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', '');
+    
+    // Close any open menus during drag
+    setMenuOpenId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedGoal(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only clear if leaving the row entirely, not just moving between cells
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (!draggedGoal || !onReorderGoals) return;
+    
+    const dragIndex = goals.findIndex(goal => goal.id === draggedGoal.id);
+    if (dragIndex === dropIndex) return;
+    
+    const newGoals = [...goals];
+    const draggedItem = newGoals.splice(dragIndex, 1)[0];
+    newGoals.splice(dropIndex, 0, draggedItem);
+    
+    onReorderGoals(newGoals);
+    setDraggedGoal(null);
+    setDragOverIndex(null);
   };
 
 
@@ -123,6 +175,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
         <table className="min-w-full bg-white rounded-xl shadow-md text-xs sm:text-sm" style={{ overflow: 'visible' }}>
           <thead>
             <tr className="bg-blue-50">
+              <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap w-8"></th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap">Goal Name</th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap">Progress</th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap" style={{ minWidth: 70, maxWidth: 120, width: 90 }}>Status</th>
@@ -131,19 +184,46 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
             </tr>
           </thead>
           <tbody>
-            {goals.map(goal => (
-              <tr key={goal.id} className="border-b group hover:bg-blue-50 cursor-pointer" style={{ overflow: 'visible', position: 'relative', zIndex: 1 }}
+            {goals.map((goal, index) => (
+              <tr 
+                key={goal.id} 
+                className={`border-b group hover:bg-blue-50 cursor-pointer transition-all duration-200 ${
+                  dragOverIndex === index ? 'bg-blue-100 border-blue-400 border-2' : ''
+                } ${
+                  draggedGoal?.id === goal.id ? 'opacity-50 bg-gray-100' : ''
+                }`}
+                style={{ 
+                  overflow: 'visible', 
+                  position: 'relative', 
+                  zIndex: 1
+                }}
+                draggable
+                onDragStart={(e) => handleDragStart(e, goal)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
                 onClick={e => {
-                  // Only open calendar if not clicking a button or the menu icon
+                  // Only open calendar if not dragging and not clicking a button or the menu icon
                   if (
+                    !draggedGoal &&
                     e.target instanceof HTMLElement &&
                     !e.target.closest('button') &&
-                    !e.target.closest('.menu-icon-btn')
+                    !e.target.closest('.menu-icon-btn') &&
+                    !e.target.closest('.drag-handle')
                   ) {
                     openCalendar(goal);
                   }
                 }}
               >
+                <td className="py-1 sm:py-2 px-2 sm:px-4 text-center w-8">
+                  <div className="flex items-center justify-center drag-handle">
+                    <FaGripVertical 
+                      className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing transition-colors" 
+                      title="Drag to reorder"
+                    />
+                  </div>
+                </td>
                 <td className="py-1 sm:py-2 px-2 sm:px-4 font-semibold max-w-[120px] truncate">{goal.goalName}</td>
                 <td className="py-1 sm:py-2 px-2 sm:px-4">
                 {/* Progress Bar */}

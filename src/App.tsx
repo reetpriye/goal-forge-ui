@@ -2,23 +2,46 @@
 import Dashboard from './components/Dashboard';
 import AccentSwitcher from './components/AccentSwitcher';
 import { useEffect, useState } from 'react';
-import { pingBackend } from './ping';
+import { pingBackend } from './services/ping';
 
 function App () {
   const [serverReady, setServerReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    // Ping backend every 5 seconds until ready
-    const pingLoop = async () => {
+    
+    // Initial ping loop every 5 seconds until ready
+    const initialPingLoop = async () => {
       let ready = false;
       while (!cancelled && !ready) {
         ready = await pingBackend();
         setServerReady(ready);
         if (!ready) await new Promise(res => setTimeout(res, 5000));
       }
+      
+      // Once ready, start the maintenance ping loop (every 14 minutes)
+      if (!cancelled && ready) {
+        maintenancePingLoop();
+      }
     };
-    pingLoop();
+    
+    // Maintenance ping loop every 14 minutes to keep server alive
+    const maintenancePingLoop = async () => {
+      while (!cancelled) {
+        await new Promise(res => setTimeout(res, 14 * 60 * 1000)); // 14 minutes
+        if (!cancelled) {
+          const ready = await pingBackend();
+          setServerReady(ready);
+          // If server goes down, restart the initial ping loop
+          if (!ready) {
+            initialPingLoop();
+            break;
+          }
+        }
+      }
+    };
+    
+    initialPingLoop();
     return () => { cancelled = true; };
   }, []);
 

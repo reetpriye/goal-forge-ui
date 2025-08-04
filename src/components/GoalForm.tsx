@@ -84,7 +84,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ newGoal, setNewGoal, addGoal }) => 
                   }
                 }}
                 min="0"
-                className="border border-transparent rounded-lg px-3 py-2 w-full focus:outline-none focus-accent-border h-[42px]"
+                className="border border-transparent rounded-lg px-3 py-2 w-full focus:outline-none focus-accent-border h-[42px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
             <div className="flex-1">
@@ -101,7 +101,7 @@ const GoalForm: React.FC<GoalFormProps> = ({ newGoal, setNewGoal, addGoal }) => 
                 }}
                 min="0"
                 max="59"
-                className="border border-transparent rounded-lg px-3 py-2 w-full focus:outline-none focus-accent-border h-[42px]"
+                className="border border-transparent rounded-lg px-3 py-2 w-full focus:outline-none focus-accent-border h-[42px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
           </div>
@@ -110,11 +110,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ newGoal, setNewGoal, addGoal }) => 
           <input
             type="number"
             placeholder="Estimated Count"
-            value={newGoal.estimatedEffort}
-            onChange={e => setNewGoal({ ...newGoal, estimatedEffort: Number(e.target.value) })}
+            value={newGoal.estimatedEffort || ''}
+            onChange={e => setNewGoal({ ...newGoal, estimatedEffort: e.target.value === '' ? '' : Number(e.target.value) })}
             required
             min="1"
-            className="border border-transparent rounded-lg px-3 py-2 w-1/2 focus:outline-none focus-accent-border min-w-0 h-[42px]"
+            className="border border-transparent rounded-lg px-3 py-2 w-1/2 focus:outline-none focus-accent-border min-w-0 h-[42px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         )}
         <button
