@@ -257,8 +257,8 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     if (editingDate === dateStr && isFutureOrToday) {
       // Show a simple indicator that this date is being edited
       return (
-        <div className="flex items-center justify-center min-h-[48px]">
-          <span className="bg-blue-500 text-white px-2 py-1 font-bold text-[0.9em] min-w-[24px] inline-block border border-blue-400 rounded-none animate-pulse">Edit</span>
+        <div className="flex items-center justify-center min-h-[36px]">
+          <span className="bg-blue-500 text-white py-1 text-[0.9em] min-w-[44px] inline-block border border-blue-400 rounded-none animate-pulse">Edit</span>
         </div>
       );
     }
@@ -266,8 +266,8 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     const effortValue = entry ? entry.effort : 0;
     const displayValue = calendarGoal?.progressType === 'dur' ? formatDuration(effortValue) : effortValue.toString();
     return (
-      <div className="flex items-center justify-center min-h-[48px]">
-        <span className="bg-gray-100 text-gray-900 px-2 py-1 font-bold text-[0.9em] min-w-[24px] inline-block border border-gray-400 rounded-none">{displayValue}</span>
+      <div className="flex items-center justify-center min-h-[36px]">
+        <span className="bg-gray-100 text-gray-900 py-1 text-[0.9em] min-w-[44px] inline-block border border-gray-400 rounded-none">{displayValue}</span>
       </div>
     );
   };
