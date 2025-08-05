@@ -17,6 +17,14 @@ const GoalForm: React.FC<GoalFormProps> = ({ newGoal, setNewGoal, addGoal }) => 
   const [durationHours, setDurationHours] = React.useState<string>('');
   const [durationMinutes, setDurationMinutes] = React.useState<string>('');
 
+  // Reset duration fields when newGoal is reset (when goalName becomes empty)
+  useEffect(() => {
+    if (newGoal.goalName === '') {
+      setDurationHours('');
+      setDurationMinutes('');
+    }
+  }, [newGoal.goalName]);
+
   // Update estimatedEffort when duration changes
   useEffect(() => {
     if (newGoal.progressType === 'dur') {

@@ -219,6 +219,11 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                     !e.target.closest('.menu-icon-btn') &&
                     !e.target.closest('.drag-handle')
                   ) {
+                    // Only allow calendar access for started goals
+                    if (goal.status === 'NOT_STARTED') {
+                      alert('Please start the goal before adding progress.');
+                      return;
+                    }
                     openCalendar(goal);
                   }
                 }}
@@ -319,7 +324,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                       >
                         {goal.status === 'NOT_STARTED' && (
                           <button
-                            className="text-left px-4 py-2 hover:bg-blue-50"
+                            className="text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150"
                             onClick={e => { e.stopPropagation(); handleStatusAction(goal, 'start'); setMenuOpenId(null); }}
                             disabled={actionLoadingId === goal.id}
                           >
@@ -328,7 +333,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                         )}
                         {goal.status === 'ACTIVE' && (
                           <button
-                            className="text-left px-4 py-2 hover:bg-blue-50"
+                            className="text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150"
                             onClick={e => { e.stopPropagation(); handleStatusAction(goal, 'pause'); setMenuOpenId(null); }}
                             disabled={actionLoadingId === goal.id}
                           >
@@ -337,7 +342,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                         )}
                         {goal.status === 'PAUSED' && (
                           <button
-                            className="text-left px-4 py-2 hover:bg-blue-50"
+                            className="text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150"
                             onClick={e => { e.stopPropagation(); handleStatusAction(goal, 'resume'); setMenuOpenId(null); }}
                             disabled={actionLoadingId === goal.id}
                           >
@@ -346,7 +351,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                         )}
                         {(goal.status === 'ACTIVE' || goal.status === 'PAUSED') && (
                           <button
-                            className="text-left px-4 py-2 hover:bg-blue-50"
+                            className="text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150"
                             onClick={e => { e.stopPropagation(); handleComplete(goal); setMenuOpenId(null); }}
                             disabled={actionLoadingId === goal.id}
                           >
@@ -354,7 +359,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                           </button>
                         )}
                         <button
-                          className="text-left px-4 py-2 hover:bg-blue-50"
+                          className="text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150"
                           onClick={e => { e.stopPropagation(); handleEditGoal(goal); setMenuOpenId(null); }}
                           disabled={actionLoadingId === goal.id}
                         >
@@ -362,7 +367,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                         </button>
                         {(goal.status === 'NOT_STARTED' || goal.status === 'ACTIVE' || goal.status === 'PAUSED' || goal.status === 'COMPLETED') && (
                           <button
-                            className="text-left px-4 py-2 hover:bg-red-50 text-red-600"
+                            className="text-left px-4 py-2 hover:bg-red-100 text-red-600 transition-colors duration-150"
                             onClick={e => { e.stopPropagation(); handleDeleteGoal(goal); setMenuOpenId(null); }}
                             disabled={actionLoadingId === goal.id}
                           >
