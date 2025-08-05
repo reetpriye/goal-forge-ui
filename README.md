@@ -1,5 +1,3 @@
-![Still in development](https://dummyimage.com/600x120/222/fff&text=Still+in+development)
-
 ![App Preview](./src/assets/sample.png)
 
 # Goal Forge → Shape and build your goals step by step
