@@ -184,7 +184,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
             <tr className="bg-blue-50">
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap w-8"></th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap">Goal Name</th>
-              <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap">Progress</th>
+              <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap hidden md:table-cell">Progress</th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap" style={{ minWidth: 70, maxWidth: 120, width: 90 }}>Status</th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap" style={{ minWidth: 90, maxWidth: 120, width: 100 }}>Start Date</th>
               <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold whitespace-nowrap">Menu</th>
@@ -237,7 +237,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                   </div>
                 </td>
                 <td className="py-1 sm:py-2 px-2 sm:px-4 font-semibold max-w-[120px] truncate">{goal.goalName}</td>
-                <td className="py-1 sm:py-2 px-2 sm:px-4">
+                <td className="py-1 sm:py-2 px-2 sm:px-4 hidden md:table-cell">
                 {/* Progress Bar */}
                 {(() => {
                   const totalEffort = goal.estimatedEffort ?? 0;
