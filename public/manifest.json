@@ -4,8 +4,8 @@
   "description": "Track and manage your personal goals with calendar-based progress tracking",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0d0d",
-  "theme_color": "#8a05ff",
+  "background_color": "#0c0c0c",
+  "theme_color": "#0c0c0c",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
