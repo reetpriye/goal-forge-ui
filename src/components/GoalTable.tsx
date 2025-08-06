@@ -219,11 +219,7 @@ const GoalTable: React.FC<GoalTableProps> = ({ goals, fetchGoals, jwt, openCalen
                     !e.target.closest('.menu-icon-btn') &&
                     !e.target.closest('.drag-handle')
                   ) {
-                    // Only allow calendar access for started goals
-                    if (goal.status === 'NOT_STARTED') {
-                      alert('Please start the goal before adding progress.');
-                      return;
-                    }
+                    // Allow calendar access for all goals
                     openCalendar(goal);
                   }
                 }}

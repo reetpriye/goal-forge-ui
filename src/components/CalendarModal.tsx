@@ -60,6 +60,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
   const [editingDate, setEditingDate] = React.useState<string | null>(null);
   const [inputEffort, setInputEffort] = React.useState<number>(0);
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [showStartGoalError, setShowStartGoalError] = React.useState(false);
   
   // For duration goals, separate hours and minutes input
   const [inputHours, setInputHours] = React.useState<number>(0);
@@ -234,6 +235,13 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (dateObj < today) return; // Only allow today/future
+    
+    // Check if goal has been started before allowing effort entry
+    if (calendarGoal?.status === 'NOT_STARTED') {
+      setShowStartGoalError(true);
+      return;
+    }
+    
     // Format date as local YYYY-MM-DD
     const pad = (n: number) => n.toString().padStart(2, '0');
     const dateStr = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}`;
@@ -286,7 +294,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
         }}
       >
         <div
-          className="p-4 sm:p-8 w-full max-w-[95vw] sm:min-w-[400px] sm:max-w-[500px] relative" style={{boxSizing: 'border-box', background: 'rgb(13,13,13)', boxShadow: 'none', borderRadius: 0}}
+          className="p-4 sm:p-8 w-full max-w-[95vw] sm:min-w-[400px] sm:max-w-[500px] relative" style={{boxSizing: 'border-box', background: 'rgb(12,12,12)', boxShadow: 'none', borderRadius: 0}}
         >
           <button
             onClick={() => {
@@ -472,6 +480,36 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
           )}
         </div>
       </div>
+      
+      {/* Start Goal Error Modal */}
+      {showStartGoalError && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md mx-4 transform transition-all duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">Goal Not Started</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Please start the goal before adding effort. You can start it by going back to the goal table and clicking the menu button, then selecting "Start".
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowStartGoalError(false)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   ) : null;
 };

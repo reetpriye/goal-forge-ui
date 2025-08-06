@@ -325,7 +325,7 @@ function Dashboard({ serverReady }: { serverReady?: boolean }) {
           onCancel={handleCancelImportChoice}
           onSkip={handleSkipImportChoice}
         />
-        <div className="mb-0" style={{background: 'rgb(13,13,13)', boxShadow: 'none', borderRadius: 0}}>
+        <div className="mb-0" style={{background: 'rgb(12,12,12)', boxShadow: 'none', borderRadius: 0}}>
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
             <Header user={user} onLogin={handleGoogleLogin} onLogout={() => {
               setJwt(null);

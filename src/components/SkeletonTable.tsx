@@ -5,7 +5,7 @@ interface SkeletonTableProps {
 }
 
 const SkeletonTable: React.FC<SkeletonTableProps> = ({ columns }) => (
-  <table className="min-w-full animate-pulse" style={{background: 'rgb(13,13,13)', boxShadow: 'none', borderRadius: 0}}>
+  <table className="min-w-full animate-pulse" style={{background: 'rgb(12,12,12)', boxShadow: 'none', borderRadius: 0}}>
     <thead>
       <tr className="bg-blue-50">
         {Array(columns).fill(0).map((_, i) => (

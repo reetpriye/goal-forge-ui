@@ -12,7 +12,7 @@ const ImportChoiceModal: React.FC<ImportChoiceModalProps> = ({ show, onAppend, o
   if (!show) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="p-8 min-w-[350px]" style={{background: 'rgb(13,13,13)', boxShadow: 'none', borderRadius: 0}}>
+      <div className="p-8 min-w-[350px]" style={{background: 'rgb(12,12,12)', boxShadow: 'none', borderRadius: 0}}>
         <h2 className="text-lg font-bold mb-4">Import Local Goals</h2>
         <p className="mb-6 text-gray-700">You have unsaved goals in your browser. What would you like to do?</p>
         <div className="flex flex-col gap-3">
