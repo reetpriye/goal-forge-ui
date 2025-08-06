@@ -335,10 +335,10 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ showCalendar, setShowCale
           </div>
           {/* Progress Bar */}
           <div className="mt-6">
-            <div className="mb-2 flex flex-col sm:flex-row justify-center gap-2 sm:gap-8 items-center text-xs sm:text-sm">
-              <span className="font-bold text-green-600">Invested: {calendarGoal?.progressType === 'dur' ? formatDuration(investedEffort) : investedEffort}</span>
-              <span className="font-bold text-gray-500">Remaining: {calendarGoal?.progressType === 'dur' ? formatDuration(remainingEffort) : remainingEffort}</span>
-              <span className="font-bold text-blue-600">Total: {calendarGoal?.progressType === 'dur' ? formatDuration(totalEffort) : totalEffort}</span>
+            <div className="mb-2 flex flex-row justify-center gap-1 sm:gap-8 items-center text-xs sm:text-sm">
+              <span className="font-bold text-green-600 text-center">Invested: {calendarGoal?.progressType === 'dur' ? formatDuration(investedEffort) : investedEffort}</span>
+              <span className="font-bold text-gray-500 text-center">Remaining: {calendarGoal?.progressType === 'dur' ? formatDuration(remainingEffort) : remainingEffort}</span>
+              <span className="font-bold text-blue-600 text-center">Total: {calendarGoal?.progressType === 'dur' ? formatDuration(totalEffort) : totalEffort}</span>
             </div>
             <div className="w-full h-2 sm:h-2 bg-gray-200 flex overflow-hidden" style={{ borderRadius: 0 }}>
               <div
