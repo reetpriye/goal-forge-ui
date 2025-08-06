@@ -1,6 +1,7 @@
 
 import Dashboard from './components/Dashboard';
 import AccentSwitcher from './components/AccentSwitcher';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { useEffect, useState } from 'react';
 import { pingBackend } from './services/ping';
 
@@ -49,6 +50,7 @@ function App () {
     <>
       <Dashboard serverReady={serverReady} />
       <AccentSwitcher />
+      <PWAInstallPrompt />
     </>
   );
 }
